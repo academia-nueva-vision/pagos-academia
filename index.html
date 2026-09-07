@@ -59,7 +59,7 @@
 </div>
 
 <script>
-    // ⚠️ REEMPLAZA ESTA URL CON TU ENLACE COPIADO DE GOOGLE APPS SCRIPT
+        // ⚠️ REEMPLAZA ESTA URL CON TU ENLACE COPIADO DE GOOGLE APPS SCRIPT
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxZzVa6uykroBc8LWaGK1Zpwh6bLF1vsO9bBaX-YO9D6w1sEY6lOHLC5tyWD7kPpmd-sA/exec";
 
     async function buscarPagos() {
@@ -70,7 +70,6 @@
         const table = document.getElementById('paymentsTable');
         const tbody = document.getElementById('paymentsBody');
 
-        // Resetear la interfaz
         errorDiv.style.display = 'none';
         profileCard.style.display = 'none';
         table.style.display = 'none';
@@ -96,7 +95,7 @@
                 return;
             }
 
-            // Mostrar información del alumno
+            // Mostrar información del alumno corregida
             document.getElementById('lblNombre').innerText = data.alumno.nombre;
             document.getElementById('lblCarrera').innerText = data.alumno.carrera;
             
@@ -106,7 +105,7 @@
             
             profileCard.style.display = 'block';
 
-            // Mostrar tabla de pagos
+            // Mostrar tabla de pagos corregida
             if (data.pagos.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#888;">No se registran pagos todavía.</td></tr>`;
             } else {
