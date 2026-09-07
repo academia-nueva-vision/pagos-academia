@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Control de Pagos - Academia</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: #f4f6f9; color: #333; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        .container { max-width: 500px; width: 100%; background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        h2 { text-align: center; margin-bottom: 20px; color: #1a73e8; font-size: 24px; }
+        .form-group { display: flex; gap: 10px; margin-bottom: 20px; }
+        input { flex: 1; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px; outline: none; transition: 0.3s; }
+        input:focus { border-color: #1a73e8; }
+        button { padding: 12px 20px; background: #1a73e8; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        button:hover { background: #1557b0; }
+        .loading { display: none; text-align: center; font-weight: bold; color: #666; margin: 15px 0; }
+        .profile-card { display: none; background: #e8f0fe; padding: 15px; border-radius: 10px; margin-bottom: 20px; border-left: 5px solid #1a73e8; }
+        .profile-card p { margin-bottom: 5px; font-size: 15px; }
+        .profile-card strong { color: #1a73e8; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; display: none; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; font-size: 14px; }
+        th { background-color: #f8f9fa; color: #555; }
+        .status-activo { color: green; font-weight: bold; }
+        .status-inactivo { color: red; font-weight: bold; }
+        .error { display: none; color: #d93025; background: #fce8e6; padding: 12px; border-radius: 8px; text-align: center; margin-bottom: 15px; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Consulta de Pagos 💻</h2>
+    
+    <div class="form-group">
+        <input type="text" id="studentId" placeholder="Ingresa tu código de alumno">
+        <button onclick="buscarPagos()">Buscar</button>
+    </div>
+
+    <div id="errorMessage" class="error"></div>
+    <div id="loadingMessage" class="loading">Buscando en la base de datos... Por favor espera.</div>
+
+    <div id="profileCard" class="profile-card">
+        <p><strong>Alumno:</strong> <span id="lblNombre"></span></p>
+        <p><strong>Carrera:</strong> <span id="lblCarrera"></span></p>
+        <p><strong>Estado:</strong> <span id="lblEstado"></span></p>
+    </div>
+
+    <table id="paymentsTable">
+        <thead>
+            <tr>
+                <th>Fecha</th>
+                <th>Concepto/Mes</th>
+                <th>Monto</th>
+                <th>Talonario</th>
+            </tr>
+        </thead>
+        <tbody id="paymentsBody"></tbody>
+    </table>
+</div>
+
+<script>
+    // ⚠️ REEMPLAZA ESTA URL CON TU ENLACE COPIADO DE GOOGLE APPS SCRIPT
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxZzVa6uykroBc8LWaGK1Zpwh6bLF1vsO9bBaX-YO9D6w1sEY6lOHLC5tyWD7kPpmd-sA/exec";
+
+    async function buscarPagos() {
+        const id = document.getElementById('studentId').value.trim();
+        const errorDiv = document.getElementById('errorMessage');
+        const loadingDiv = document.getElementById('loadingMessage');
+        const profileCard = document.getElementById('profileCard');
+        const table = document.getElementById('paymentsTable');
+        const tbody = document.getElementById('paymentsBody');
+
+        // Resetear la interfaz
+        errorDiv.style.display = 'none';
+        profileCard.style.display = 'none';
+        table.style.display = 'none';
+        tbody.innerHTML = '';
+
+        if (!id) {
+            errorDiv.innerText = "Por favor, escribe un código de alumno.";
+            errorDiv.style.display = 'block';
+            return;
+        }
+
+        loadingDiv.style.display = 'block';
+
+        try {
+            const response = await fetch(`${WEB_APP_URL}?id=${id}`);
+            const data = await response.json();
+
+            loadingDiv.style.display = 'none';
+
+            if (data.error) {
+                errorDiv.innerText = "Código incorrecto o alumno no registrado.";
+                errorDiv.style.display = 'block';
+                return;
+            }
+
+            // Mostrar información del alumno
+            document.getElementById('lblNombre').innerText = data.alumno.nombre;
+            document.getElementById('lblCarrera').innerText = data.alumno.carrera;
+            
+            const estadoSpan = document.getElementById('lblEstado');
+            estadoSpan.innerText = data.alumno.estado;
+            estadoSpan.className = data.alumno.estado.toLowerCase() === 'activo' ? 'status-activo' : 'status-inactivo';
+            
+            profileCard.style.display = 'block';
+
+            // Mostrar tabla de pagos
+            if (data.pagos.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#888;">No se registran pagos todavía.</td></tr>`;
+            } else {
+                data.pagos.forEach(pago => {
+                    const row = `<tr>
+                        <td>${pago.fecha}</td>
+                        <td>${pago.mesPagado}</td>
+                        <td>Q ${parseFloat(pago.monto).toFixed(2)}</td>
+                        <td>#${pago.talonario}</td>
+                    </tr>`;
+                    tbody.innerHTML += row;
+                });
+            }
+            table.style.display = 'table';
+
+        } catch (error) {
+            loadingDiv.style.display = 'none';
+            errorDiv.innerText = "Error al conectar con el servidor. Inténtalo de nuevo.";
+            errorDiv.style.display = 'block';
+            console.error(error);
+        }
+    }
+</script>
+
+</body>
+</html>
