@@ -19,8 +19,6 @@
         .profile-card { display: none; background: #e8f0fe; padding: 12px; border-radius: 10px; margin-bottom: 15px; border-left: 5px solid #1a73e8; }
         .profile-card p { margin-bottom: 4px; font-size: 14px; }
         .profile-card strong { color: #1a73e8; }
-        
-        /* 🚨 AQUÍ ESTÁ EL ARREGLO DE LA TABLA PARA CELULARES */
         .table-responsive { width: 100%; overflow-x: auto; margin-top: 10px; }
         table { width: 100%; border-collapse: collapse; display: none; min-width: 320px; }
         th, td { padding: 8px 6px; text-align: left; border-bottom: 1px solid #ddd; font-size: 13px; word-break: break-word; }
@@ -38,14 +36,14 @@
     <div class="subtitle">Consulta de Control de Pagos</div>
     
     <div class="form-group">
-        <input type="number" id="studentId" placeholder="Tu código de alumno" pattern="[0-9]*" inputmode="numeric">
+        <input type="text" id="studentId" placeholder="Tu código de alumno">
         <button onclick="buscarPagos()">Buscar</button>
     </div>
 
     <div id="errorMessage" class="error"></div>
     <div id="loadingMessage" class="loading">Buscando en la base de datos...</div>
 
-     <div id="profileCard" class="profile-card">
+    <div id="profileCard" class="profile-card">
         <p><strong>Alumno:</strong> <span id="lblNombre"></span></p>
         <p><strong>Grado:</strong> <span id="lblGrado"></span></p>
         <p><strong>Curso:</strong> <span id="lblCurso"></span></p>
@@ -69,7 +67,6 @@
 </div>
 
 <script>
-    // ⚠️ REEMPLAZA ESTA URL CON TU ENLACE COPIADO DE GOOGLE APPS SCRIPT
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxZzVa6uykroBc8LWaGK1Zpwh6bLF1vsO9bBaX-YO9D6w1sEY6lOHLC5tyWD7kPpmd-sA/exec";
 
     async function buscarPagos() {
