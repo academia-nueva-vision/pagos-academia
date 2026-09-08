@@ -3,63 +3,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Control de Pagos - Academia</title>
+    <title>Control de Pagos - Academia Nueva Visión</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background-color: #f4f6f9; color: #333; padding: 20px; display: flex; flex-direction: column; align-items: center; }
-        .container { max-width: 500px; width: 100%; background: white; padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-        h2 { text-align: center; margin-bottom: 20px; color: #1a73e8; font-size: 24px; }
-        .form-group { display: flex; gap: 10px; margin-bottom: 20px; }
-        input { flex: 1; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px; outline: none; transition: 0.3s; }
+        body { background-color: #f4f6f9; color: #333; padding: 12px; display: flex; flex-direction: column; align-items: center; }
+        .container { max-width: 500px; width: 100%; background: white; padding: 15px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); overflow: hidden; }
+        h2 { text-align: center; margin-bottom: 5px; color: #1a73e8; font-size: 22px; }
+        .subtitle { text-align: center; color: #666; margin-bottom: 20px; font-size: 13px; }
+        .form-group { display: flex; gap: 8px; margin-bottom: 20px; }
+        input { flex: 1; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 16px; outline: none; transition: 0.3s; width: 100%; }
         input:focus { border-color: #1a73e8; }
-        button { padding: 12px 20px; background: #1a73e8; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        button { padding: 12px 16px; background: #1a73e8; color: white; border: none; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; transition: 0.3s; white-space: nowrap; }
         button:hover { background: #1557b0; }
-        .loading { display: none; text-align: center; font-weight: bold; color: #666; margin: 15px 0; }
-        .profile-card { display: none; background: #e8f0fe; padding: 15px; border-radius: 10px; margin-bottom: 20px; border-left: 5px solid #1a73e8; }
-        .profile-card p { margin-bottom: 5px; font-size: 15px; }
+        .loading { display: none; text-align: center; font-weight: bold; color: #666; margin: 15px 0; font-size: 14px; }
+        .profile-card { display: none; background: #e8f0fe; padding: 12px; border-radius: 10px; margin-bottom: 15px; border-left: 5px solid #1a73e8; }
+        .profile-card p { margin-bottom: 4px; font-size: 14px; }
         .profile-card strong { color: #1a73e8; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; display: none; }
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; font-size: 14px; }
-        th { background-color: #f8f9fa; color: #555; }
+        
+        /* 🚨 AQUÍ ESTÁ EL ARREGLO DE LA TABLA PARA CELULARES */
+        .table-responsive { width: 100%; overflow-x: auto; margin-top: 10px; }
+        table { width: 100%; border-collapse: collapse; display: none; min-width: 320px; }
+        th, td { padding: 8px 6px; text-align: left; border-bottom: 1px solid #ddd; font-size: 13px; word-break: break-word; }
+        th { background-color: #f8f9fa; color: #555; font-weight: 600; }
+        .monto-celda { white-space: nowrap; font-weight: bold; color: #1a73e8; }
         .status-activo { color: green; font-weight: bold; }
         .status-inactivo { color: red; font-weight: bold; }
-        .error { display: none; color: #d93025; background: #fce8e6; padding: 12px; border-radius: 8px; text-align: center; margin-bottom: 15px; font-weight: bold; }
+        .error { display: none; color: #d93025; background: #fce8e6; padding: 12px; border-radius: 8px; text-align: center; margin-bottom: 15px; font-size: 14px; font-weight: bold; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>Consulta de Pagos 💻</h2>
+    <h2>Academia Nueva Visión 💻</h2>
+    <div class="subtitle">Consulta de Control de Pagos</div>
     
     <div class="form-group">
-        <input type="text" id="studentId" placeholder="Ingresa tu código de alumno">
+        <input type="number" id="studentId" placeholder="Tu código de alumno" pattern="[0-9]*" inputmode="numeric">
         <button onclick="buscarPagos()">Buscar</button>
     </div>
 
     <div id="errorMessage" class="error"></div>
-    <div id="loadingMessage" class="loading">Buscando en la base de datos... Por favor espera.</div>
+    <div id="loadingMessage" class="loading">Buscando en la base de datos...</div>
 
     <div id="profileCard" class="profile-card">
         <p><strong>Alumno:</strong> <span id="lblNombre"></span></p>
         <p><strong>Carrera:</strong> <span id="lblCarrera"></span></p>
         <p><strong>Estado:</strong> <span id="lblEstado"></span></p>
+        <p><strong>Teléfono:</strong> <span id="lblTelefono"></span></p>
     </div>
 
-    <table id="paymentsTable">
-        <thead>
-            <tr>
-                <th>Fecha</th>
-                <th>Concepto/Mes</th>
-                <th>Monto</th>
-                <th>Talonario</th>
-            </tr>
-        </thead>
-        <tbody id="paymentsBody"></tbody>
-    </table>
+    <div class="table-responsive">
+        <table id="paymentsTable">
+            <thead>
+                <tr>
+                    <th>Fecha</th>
+                    <th>Mes</th>
+                    <th>Monto</th>
+                    <th>Talonario</th>
+                </tr>
+            </thead>
+            <tbody id="paymentsBody"></tbody>
+        </table>
+    </div>
 </div>
 
 <script>
-        // ⚠️ REEMPLAZA ESTA URL CON TU ENLACE COPIADO DE GOOGLE APPS SCRIPT
+    // ⚠️ REEMPLAZA ESTA URL CON TU ENLACE COPIADO DE GOOGLE APPS SCRIPT
     const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxZzVa6uykroBc8LWaGK1Zpwh6bLF1vsO9bBaX-YO9D6w1sEY6lOHLC5tyWD7kPpmd-sA/exec";
 
     async function buscarPagos() {
@@ -95,7 +104,6 @@
                 return;
             }
 
-            // Mostrar información del alumno corregida
             document.getElementById('lblNombre').innerText = data.alumno.nombre;
             document.getElementById('lblCarrera').innerText = data.alumno.carrera;
             
@@ -103,9 +111,10 @@
             estadoSpan.innerText = data.alumno.estado;
             estadoSpan.className = data.alumno.estado.toLowerCase() === 'activo' ? 'status-activo' : 'status-inactivo';
             
+            document.getElementById('lblTelefono').innerText = data.alumno.telefono || "No registrado";
+            
             profileCard.style.display = 'block';
 
-            // Mostrar tabla de pagos corregida
             if (data.pagos.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#888;">No se registran pagos todavía.</td></tr>`;
             } else {
@@ -113,7 +122,7 @@
                     const row = `<tr>
                         <td>${pago.fecha}</td>
                         <td>${pago.mesPagado}</td>
-                        <td>Q ${parseFloat(pago.monto).toFixed(2)}</td>
+                        <td class="monto-celda">Q${parseFloat(pago.monto).toFixed(2)}</td>
                         <td>#${pago.talonario}</td>
                     </tr>`;
                     tbody.innerHTML += row;
